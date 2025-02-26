@@ -153,6 +153,27 @@ else
     exit 1
 fi
 
+# 允许 HTTP 和 HTTPS 端口
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+if [ $? -eq 0 ]; then
+    echo "放行 HTTP 和 HTTPS 端口成功"
+    CONFIG_LIST+="放行 HTTP 和 HTTPS 端口成功\n"
+else
+    echo "放行 HTTP 和 HTTPS 端口失败"
+    exit 1
+fi
+
+# 禁用 80 端口的 IPv6 服务
+sudo ufw deny 80/tcp6
+if [ $? -eq 0 ]; then
+    echo "禁用 80 端口的 IPv6 服务成功"
+    CONFIG_LIST+="禁用 80 端口的 IPv6 服务成功\n"
+else
+    echo "禁用 80 端口的 IPv6 服务失败"
+    exit 1
+fi
+
 # 启用 UFW
 sudo ufw enable
 if [ $? -eq 0 ]; then
@@ -176,7 +197,7 @@ fi
 if grep -q '^PasswordAuthentication no' /etc/ssh/sshd_config && \
    grep -q '^PubkeyAuthentication yes' /etc/ssh/sshd_config && \
    grep -q '^UsePAM no' /etc/ssh/sshd_config && \
-   grep -q '^AuthorizedKeysFile     .ssh\/authorized_keys .ssh\/authorized_keys2' /etc/ssh/sshd_config; then
+   grep -q '^AuthorizedKeysFile     .ssh\/authorized_keys' /etc/ssh/sshd_config; then
     echo "SSH 配置已正确设置"
     CONFIG_LIST+="SSH 配置已正确设置\n"
 else
