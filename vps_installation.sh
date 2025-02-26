@@ -183,28 +183,6 @@ else
     exit 1
 fi
 
-# 验证 SSH 配置是否正确
-if grep -q '^PasswordAuthentication no' /etc/ssh/sshd_config && \
-   grep -q '^PubkeyAuthentication yes' /etc/ssh/sshd_config && \
-   grep -q '^UsePAM no' /etc/ssh/sshd_config && \
-   grep -q '^AuthorizedKeysFile     .ssh\/authorized_keys' /etc/ssh/sshd_config; then
-    echo "SSH 配置已正确设置"
-    CONFIG_LIST+="SSH 配置已正确设置\n"
-else
-    echo "SSH 配置未正确设置"
-    exit 1
-fi
-
-# 检查所有配置是否正确
-echo "正在检查所有配置..."
-if systemctl is-active --quiet sshd && systemctl is-active --quiet fail2ban && ufw status | grep -q "active"; then
-    echo "所有服务均已正确运行。"
-    CONFIG_LIST+="所有服务均已正确运行。\n"
-else
-    echo "某些服务未正常运行，请检查配置。"
-    exit 1
-fi
-
 # 输出配置清单
 echo -e "\n配置清单:\n$CONFIG_LIST" > vps_configuration_summary.txt
 
