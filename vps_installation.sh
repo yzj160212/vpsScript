@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e  # 如果任何命令失败，立即退出
 
 # VPS 设置脚本
 
@@ -8,12 +9,32 @@ CONFIG_LIST=""
 # 函数：检查命令执行状态
 check_command() {
     if [ $? -eq 0 ]; then
-        echo "$1 成功"
+        printf "%s 成功\n" "$1"
         CONFIG_LIST+="$1 成功\n"
     else
-        echo "$1 失败"
+        printf "%s 失败\n" "$1"
         exit 1
     fi
+}
+
+# 函数：配置 SSH
+configure_ssh() {
+    local ssh_port="$1"
+    local ssh_public_key="$2"
+
+    sudo sed -i "s/^#Port 22/Port $ssh_port/" /etc/ssh/sshd_config
+    check_command "SSH 端口修改"
+
+    # 确保 root 用户的 .ssh 目录存在并设置权限
+    mkdir -p /root/.ssh
+    chmod 700 /root/.ssh
+
+    # 确保 authorized_keys 文件存在并设置权限
+    touch /root/.ssh/authorized_keys
+    chmod 600 /root/.ssh/authorized_keys
+
+    # 写入公钥
+    echo "$ssh_public_key" >> /root/.ssh/authorized_keys
 }
 
 # 更新系统
@@ -29,7 +50,7 @@ sudo wget -O /etc/ssh/sshd_config https://raw.githubusercontent.com/yzj160212/vp
 check_command "上传 sshd_config"
 
 # 修改 SSH 端口
-echo -e "\e[1;32m请输入自定义 SSH 端口号 (1-65535):\e[0m"
+printf "\e[1;32m请输入自定义 SSH 端口号 (1-65535):\e[0m\n"
 read -p "" SSH_PORT
 
 # 输入验证：检查端口号是否在有效范围内
@@ -38,14 +59,8 @@ if ! [[ "$SSH_PORT" =~ ^[0-9]+$ ]] || [ "$SSH_PORT" -lt 1 ] || [ "$SSH_PORT" -gt
     exit 1
 fi
 
-sudo sed -i "s/^#Port 22/Port $SSH_PORT/" /etc/ssh/sshd_config
-check_command "SSH 端口修改"
-
-# 重启 SSH
-sudo service sshd restart
-
-# 配置 SSH 密钥登录
-echo -e "\e[1;32m请输入您的 SSH 公钥:\e[0m"
+# 配置 SSH
+printf "\e[1;32m请输入您的 SSH 公钥:\e[0m\n"
 read -p "" SSH_PUBLIC_KEY
 
 # 输入验证：检查公钥是否为空
@@ -54,16 +69,7 @@ if [ -z "$SSH_PUBLIC_KEY" ]; then
     exit 1
 fi
 
-# 确保 root 用户的 .ssh 目录存在并设置权限
-mkdir -p /root/.ssh
-chmod 700 /root/.ssh
-
-# 确保 authorized_keys 文件存在并设置权限
-touch /root/.ssh/authorized_keys
-chmod 600 /root/.ssh/authorized_keys
-
-# 写入公钥
-echo "$SSH_PUBLIC_KEY" >> /root/.ssh/authorized_keys
+configure_ssh "$SSH_PORT" "$SSH_PUBLIC_KEY"
 
 # 重启 SSH
 sudo service sshd restart
@@ -85,7 +91,7 @@ sudo apt install ufw -y
 check_command "UFW 安装"
 
 # 允许 SSH 端口
-sudo ufw allow $SSH_PORT/tcp
+sudo ufw allow "$SSH_PORT"/tcp
 check_command "放行 SSH 端口 $SSH_PORT"
 
 # 允许 HTTP 和 HTTPS 端口
@@ -109,9 +115,3 @@ fi
 # 重启服务器后自动重启 fail2ban 服务
 sudo systemctl enable fail2ban
 check_command "fail2ban 服务设置为开机自启动"
-
-# 输出配置清单
-echo -e "\n配置清单:\n$CONFIG_LIST" > vps_configuration_summary.txt
-
-# 提示用户复制配置清单
-echo "配置清单已保存到 vps_configuration_summary.txt"
