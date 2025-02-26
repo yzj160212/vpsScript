@@ -185,6 +185,15 @@ else
 fi
 
 # 检查所有配置是否正确
+echo "正在检查所有配置..."
+if systemctl is-active --quiet sshd && systemctl is-active --quiet fail2ban && ufw status | grep -q "active"; then
+    echo "所有服务均已正确运行。"
+    CONFIG_LIST+="所有服务均已正确运行。\n"
+else
+    echo "某些服务未正常运行，请检查配置。"
+    exit 1
+fi
+
 # 输出配置清单
 echo -e "\n配置清单:\n$CONFIG_LIST" > vps_configuration_summary.txt
 
