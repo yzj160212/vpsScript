@@ -105,23 +105,8 @@ else
     exit 1
 fi
 
-# 创建 fail2ban 配置文件
-sudo bash -c 'cat > /etc/fail2ban/jail.local << EOF
-[sshd]
-enabled = true
-port = $SSH_PORT
-filter = sshd
-logpath = /var/log/auth.log
-maxretry = 5
-bantime = 600
-EOF'
-if [ $? -eq 0 ]; then
-    echo "fail2ban SSH 配置成功"
-    CONFIG_LIST+="fail2ban SSH 配置成功\n"
-else
-    echo "fail2ban SSH 配置失败"
-    exit 1
-fi
+# 上传 fail2ban 配置文件
+sudo wget -O /etc/fail2ban/jail.local https://raw.githubusercontent.com/yzj160212/vpsScript/main/jail.local
 
 # 重启 fail2ban 服务
 sudo systemctl restart fail2ban
@@ -180,6 +165,16 @@ if systemctl is-active --quiet fail2ban; then
     CONFIG_LIST+="fail2ban 服务正在运行\n"
 else
     echo "fail2ban 服务未运行"
+    exit 1
+fi
+
+# 重启服务器后自动重启 fail2ban 服务
+sudo systemctl enable fail2ban
+if [ $? -eq 0 ]; then
+    echo "fail2ban 服务设置为开机自启动"
+    CONFIG_LIST+="fail2ban 服务设置为开机自启动\n"
+else
+    echo "fail2ban 服务设置为开机自启动失败"
     exit 1
 fi
 
