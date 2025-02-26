@@ -44,31 +44,6 @@ check_command "SSH 端口修改"
 # 重启 SSH
 sudo service sshd restart
 
-# 创建新用户
-echo -e "\e[1;32m请输入新用户名称:\e[0m"
-read -p "" NEW_USER
-
-# 输入验证：检查用户名是否为空
-if [ -z "$NEW_USER" ]; then
-    echo "用户名不能为空。"
-    exit 1
-fi
-
-sudo adduser $NEW_USER
-check_command "新用户 $NEW_USER 创建"
-
-# 安装 sudo
-sudo apt install sudo -y
-check_command "sudo 安装"
-
-# 配置 sudo 权限
-echo "$NEW_USER ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers
-check_command "用户 $NEW_USER 配置 sudo 权限"
-
-# 禁止 root 登录
-sudo sed -i 's/^PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
-check_command "禁止 root 登录设置"
-
 # 配置 SSH 密钥登录
 echo -e "\e[1;32m请输入您的 SSH 公钥:\e[0m"
 read -p "" SSH_PUBLIC_KEY
@@ -79,16 +54,16 @@ if [ -z "$SSH_PUBLIC_KEY" ]; then
     exit 1
 fi
 
-# 确保新用户的 .ssh 目录存在并设置权限
-sudo mkdir -p /home/$NEW_USER/.ssh
-sudo chmod 700 /home/$NEW_USER/.ssh
+# 确保 root 用户的 .ssh 目录存在并设置权限
+mkdir -p /root/.ssh
+chmod 700 /root/.ssh
 
 # 确保 authorized_keys 文件存在并设置权限
-sudo touch /home/$NEW_USER/.ssh/authorized_keys
-sudo chmod 600 /home/$NEW_USER/.ssh/authorized_keys
+touch /root/.ssh/authorized_keys
+chmod 600 /root/.ssh/authorized_keys
 
 # 写入公钥
-echo "$SSH_PUBLIC_KEY" | sudo tee -a /home/$NEW_USER/.ssh/authorized_keys
+echo "$SSH_PUBLIC_KEY" >> /root/.ssh/authorized_keys
 
 # 重启 SSH
 sudo service sshd restart

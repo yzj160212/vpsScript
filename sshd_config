@@ -116,4 +116,4 @@ Subsystem sftp	/usr/lib/openssh/sftp-server
 #	ForceCommand cvs server
 ClientAliveInterval 120
 PasswordAuthentication no
-PermitRootLogin no
+PermitRootLogin yes
