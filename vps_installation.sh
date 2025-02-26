@@ -115,7 +115,7 @@ else
 fi
 
 # 上传 fail2ban 配置文件
-sudo wget -O /etc/fail2ban/jail.local https://raw.githubusercontent.com/yzj160212/vpsScript/main/jail.local
+sudo wget -O /etc/fail2ban/jail.conf https://raw.githubusercontent.com/yzj160212/vpsScript/main/jail.conf
 
 # 重启 fail2ban 服务
 sudo systemctl restart fail2ban
