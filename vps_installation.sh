@@ -25,7 +25,8 @@ else
     exit 1
 fi
 
-date
+# 上传sshd_config
+sudo wget -O /etc/ssh/sshd_config https://raw.githubusercontent.com/yzj160212/vpsScript/main/sshd_config
 
 # 修改 SSH 端口
 echo -e "\e[1;32m请输入自定义 SSH 端口号:\e[0m"
@@ -90,21 +91,6 @@ echo -e "\e[1;32m请输入您的 SSH 公钥:\e[0m"
 read -p "" SSH_PUBLIC_KEY
 echo "$SSH_PUBLIC_KEY" >> ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
-
-# 修改 SSH 配置
-sudo bash -c 'cat > /etc/ssh/sshd_config << EOF
-$(cat /etc/ssh/sshd_config | sed -e 's/^#PubkeyAuthentication yes/PubkeyAuthentication yes/' \
--e 's/^#PasswordAuthentication yes/PasswordAuthentication no/' \
--e 's/^#UsePAM yes/UsePAM no/' \
--e 's/^#AuthorizedKeysFile     .ssh\/authorized_keys .ssh\/authorized_keys2/AuthorizedKeysFile     .ssh\/authorized_keys .ssh\/authorized_keys2/')
-EOF'
-if [ $? -eq 0 ]; then
-    echo "SSH 配置已正确设置"
-    CONFIG_LIST+="SSH 配置已正确设置\n"
-else
-    echo "SSH 配置未正确设置"
-    exit 1
-fi
 
 # 重启 SSH
 sudo service sshd restart
