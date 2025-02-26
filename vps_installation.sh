@@ -90,8 +90,10 @@ echo -e "\e[1;32m请输入您的 SSH 公钥:\e[0m"
 read -p "" SSH_PUBLIC_KEY
 echo "$SSH_PUBLIC_KEY" >> ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
-sudo sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
-sudo sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+sudo sed -i -e 's/^#PubkeyAuthentication yes/PubkeyAuthentication yes/' \
+-e 's/^#PasswordAuthentication yes/PasswordAuthentication no/' \
+-e 's/^#UsePAM yes/UsePAM no/' \
+-e 's/^#AuthorizedKeysFile     .ssh\/authorized_keys .ssh\/authorized_keys2/AuthorizedKeysFile     .ssh\/authorized_keys .ssh\/authorized_keys2/' /etc/ssh/sshd_config
 if [ $? -eq 0 ]; then
     echo "SSH 密钥登录配置成功"
     CONFIG_LIST+="SSH 密钥登录配置成功\n"
@@ -168,21 +170,24 @@ else
     exit 1
 fi
 
-# 验证 SSH 密码登录是否禁用
-if grep -q '^PasswordAuthentication no' /etc/ssh/sshd_config; then
-    echo "SSH 密码登录已禁用"
-    CONFIG_LIST+="SSH 密码登录已禁用\n"
-else
-    echo "SSH 密码登录未禁用"
-    exit 1
-fi
-
 # 验证 fail2ban 是否安装
 if systemctl is-active --quiet fail2ban; then
     echo "fail2ban 服务正在运行"
     CONFIG_LIST+="fail2ban 服务正在运行\n"
 else
     echo "fail2ban 服务未运行"
+    exit 1
+fi
+
+# 验证 SSH 配置是否正确
+if grep -q '^PasswordAuthentication no' /etc/ssh/sshd_config && \
+   grep -q '^PubkeyAuthentication yes' /etc/ssh/sshd_config && \
+   grep -q '^UsePAM no' /etc/ssh/sshd_config && \
+   grep -q '^AuthorizedKeysFile     .ssh\/authorized_keys .ssh\/authorized_keys2' /etc/ssh/sshd_config; then
+    echo "SSH 配置已正确设置"
+    CONFIG_LIST+="SSH 配置已正确设置\n"
+else
+    echo "SSH 配置未正确设置"
     exit 1
 fi
 
