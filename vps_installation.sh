@@ -28,7 +28,8 @@ fi
 date
 
 # 修改 SSH 端口
-read -p "请输入自定义 SSH 端口号: " SSH_PORT
+echo -e "\e[1;32m请输入自定义 SSH 端口号:\e[0m"
+read -p "" SSH_PORT
 sudo sed -i "s/^#Port 22/Port $SSH_PORT/" /etc/ssh/sshd_config
 if [ $? -eq 0 ]; then
     echo "SSH 端口修改成功"
@@ -42,7 +43,8 @@ fi
 sudo service sshd restart
 
 # 创建新用户
-read -p "请输入新用户名称: " NEW_USER
+echo -e "\e[1;32m请输入新用户名称:\e[0m"
+read -p "" NEW_USER
 sudo adduser $NEW_USER
 if [ $? -eq 0 ]; then
     echo "新用户 $NEW_USER 创建成功"
@@ -84,7 +86,8 @@ else
 fi
 
 # 配置 SSH 密钥登录
-read -p "请输入您的 SSH 公钥: " SSH_PUBLIC_KEY
+echo -e "\e[1;32m请输入您的 SSH 公钥:\e[0m"
+read -p "" SSH_PUBLIC_KEY
 echo "$SSH_PUBLIC_KEY" >> ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
 sudo sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
