@@ -164,16 +164,6 @@ else
     exit 1
 fi
 
-# 禁用 80 端口的 IPv6 服务
-sudo ufw deny 80/tcp6
-if [ $? -eq 0 ]; then
-    echo "禁用 80 端口的 IPv6 服务成功"
-    CONFIG_LIST+="禁用 80 端口的 IPv6 服务成功\n"
-else
-    echo "禁用 80 端口的 IPv6 服务失败"
-    exit 1
-fi
-
 # 启用 UFW
 sudo ufw enable
 if [ $? -eq 0 ]; then
@@ -181,6 +171,16 @@ if [ $? -eq 0 ]; then
     CONFIG_LIST+="UFW 启用成功\n"
 else
     echo "UFW 启用失败"
+    exit 1
+fi
+
+# 禁用 80 端口的 IPv6 服务
+sudo ufw deny 80/tcp6
+if [ $? -eq 0 ]; then
+    echo "禁用 80 端口的 IPv6 服务成功"
+    CONFIG_LIST+="禁用 80 端口的 IPv6 服务成功\n"
+else
+    echo "禁用 80 端口的 IPv6 服务失败"
     exit 1
 fi
 
