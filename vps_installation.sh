@@ -3,9 +3,6 @@ set -e  # 如果任何命令失败，立即退出
 
 # VPS 设置脚本
 
-# 记录配置清单
-CONFIG_LIST=""
-
 # 函数：检查命令执行状态
 check_command() {
     if [ $? -eq 0 ]; then
@@ -106,7 +103,6 @@ check_command "UFW 启用"
 # 验证 fail2ban 是否安装
 if systemctl is-active --quiet fail2ban; then
     echo "fail2ban 服务正在运行"
-    CONFIG_LIST+="fail2ban 服务正在运行\n"
 else
     echo "fail2ban 服务未运行"
     exit 1
