@@ -89,8 +89,17 @@ fi
 # 配置 SSH 密钥登录
 echo -e "\e[1;32m请输入您的 SSH 公钥:\e[0m"
 read -p "" SSH_PUBLIC_KEY
-echo "$SSH_PUBLIC_KEY" >> ~/.ssh/authorized_keys
-chmod 600 ~/.ssh/authorized_keys
+
+# 确保新用户的 .ssh 目录存在并设置权限
+sudo mkdir -p /home/$NEW_USER/.ssh
+sudo chmod 700 /home/$NEW_USER/.ssh
+
+# 确保 authorized_keys 文件存在并设置权限
+sudo touch /home/$NEW_USER/.ssh/authorized_keys
+sudo chmod 600 /home/$NEW_USER/.ssh/authorized_keys
+
+# 写入公钥
+echo "$SSH_PUBLIC_KEY" | sudo tee -a /home/$NEW_USER/.ssh/authorized_keys
 
 # 重启 SSH
 sudo service sshd restart
