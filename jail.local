@@ -1,0 +1,15 @@
+[sshd]
+enable = true
+port = $SSH_PORT
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 3
+bantime = -1
+
+# 注释：此配置用于 fail2ban 的 SSHD 监控
+# enable: 启用 SSHD 监控
+# port: 监听的 SSH 端口，使用变量 $SSH_PORT
+# filter: 使用的过滤器，指定为 sshd
+# logpath: 日志文件路径，监控此文件以检测失败的登录尝试
+# maxretry: 允许的最大失败尝试次数
+# bantime: 被禁止的时间，-1 表示永久禁止

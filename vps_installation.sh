@@ -79,7 +79,7 @@ sudo apt install fail2ban -y
 check_command "fail2ban 安装"
 
 # 上传 fail2ban 配置文件
-sudo wget -O /etc/fail2ban/jail.conf https://raw.githubusercontent.com/yzj160212/vpsScript/main/jail.conf
+sudo wget -O /etc/fail2ban/jail.local https://raw.githubusercontent.com/yzj160212/vpsScript/main/jail.local
 check_command "上传 fail2ban 配置文件"
 
 # 重启 fail2ban 服务
