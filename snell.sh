@@ -4,8 +4,6 @@
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 RESET='\033[0m'
 
@@ -57,13 +55,8 @@ wait_for_package_manager() {
 # 安装必要的软件包
 install_required_packages() {
     echo -e "${GREEN}安装必要的软件包${RESET}"
-    if command -v apt &>/dev/null; then
-        apt update -q
-        apt install -y -q wget unzip curl
-    else
-        apt-get update -q
-        apt-get install -y -q wget unzip curl
-    fi
+    apt-get update -q
+    apt-get install -y -q wget unzip curl
 }
 
 # 检查是否以 root 权限运行
