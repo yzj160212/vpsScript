@@ -362,9 +362,9 @@ show_menu() {
     fi
 
     # 美化菜单标题和分隔线
-    echo -e "${CYAN}╔════════════════════════════════╗${RESET}"
-    echo -e "${CYAN}║         🚀 Snell 工具           ║${RESET}"
-    echo -e "${CYAN}╚════════════════════════════════╝${RESET}"
+    echo -e "${CYAN}╔═══════════════════════════════╗${RESET}"
+    echo -e "${CYAN}║        🚀 Snell Proxy         ║${RESET}"
+    echo -e "${CYAN}╚═══════════════════════════════╝${RESET}"
     echo -e "安装状态: ${installation_status}"
     echo -e "运行状态: ${running_status}"
     echo -e "运行版本: ${version_status}"
