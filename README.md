@@ -5,7 +5,7 @@ wget https://raw.githubusercontent.com/yzj160212/vpsScript/main/vps_installation
 
 ### 一键snell（只支持debian）
 ```
-wget https://raw.githubusercontent.com/yzj160212/vpsScript/main/snell.sh -O snell.sh && chmod +x snell.sh && sudo ./snell.sh
+bash <(curl -fsSL snell-yy.vercel.app)
 ```
 
 ## 常用指令
