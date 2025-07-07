@@ -340,7 +340,7 @@ show_menu() {
     if [ $snell_installed -eq 0 ]; then
         installation_status="${GREEN}已安装${RESET}"
         if version_output=$(/usr/local/bin/snell-server -version 2>&1); then
-            snell_version=$(echo "$version_output" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+[a-zA-Z0-9\-]*')
+            snell_version=$(echo "$version_output" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+[a-zA-Z0-9]*')
             if [ -n "$snell_version" ]; then
                 version_status="${GREEN}${snell_version}${RESET}"
             else
@@ -363,7 +363,7 @@ show_menu() {
 
     # 美化菜单标题和分隔线
     echo -e "${CYAN}╔═══════════════════════════════╗${RESET}"
-    echo -e "${CYAN}║        🚀 Snell Proxy         ║${RESET}"
+    echo -e "${CYAN}║        🚀 Snell Proxy          ║${RESET}"
     echo -e "${CYAN}╚═══════════════════════════════╝${RESET}"
     echo -e "安装状态: ${installation_status}"
     echo -e "运行状态: ${running_status}"
@@ -381,7 +381,7 @@ show_menu() {
     echo "4. 更新 Snell 服务"
     echo "5. 查看 Snell 配置"
     echo "0. 退出"
-    echo -e "${CYAN}══════════════════════════════════${RESET}"
+    echo -e "${CYAN}═════════════════════════════════${RESET}"
     while true; do
         read -p "请输入选项编号: " choice
         if [[ "$choice" =~ ^[0-9]+$ ]]; then
