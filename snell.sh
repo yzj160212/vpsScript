@@ -363,7 +363,7 @@ show_menu() {
 
     # 美化菜单标题和分隔线
     echo -e "${CYAN}╔════════════════════════════════╗${RESET}"
-    echo -e "${CYAN}║         🚀 Snell 部署           ║${RESET}"
+    echo -e "${CYAN}║         🚀 Snell 工具           ║${RESET}"
     echo -e "${CYAN}╚════════════════════════════════╝${RESET}"
     echo -e "安装状态: ${installation_status}"
     echo -e "运行状态: ${running_status}"
