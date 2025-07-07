@@ -10,7 +10,7 @@ CYAN='\033[0;36m'
 RESET='\033[0m'
 
 # 基础配置
-LOG_FILE="/var/log/snell_manager.log"
+# LOG_FILE="/var/log/snell_manager.log"  # 已移除日志文件
 SERVICE_NAME="snell.service"
 INSTALL_DIR="/usr/local/bin"
 CONF_DIR="/etc/snell"
@@ -94,10 +94,8 @@ start_snell() {
     systemctl start "$SERVICE_NAME"
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}Snell 启动成功${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - Snell 启动成功" >> "$LOG_FILE"
     else
         echo -e "${RED}Snell 启动失败${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - Snell 启动失败" >> "$LOG_FILE"
     fi
 }
 
@@ -106,10 +104,8 @@ stop_snell() {
     systemctl stop "$SERVICE_NAME"
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}Snell 停止成功${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - Snell 停止成功" >> "$LOG_FILE"
     else
         echo -e "${RED}Snell 停止失败${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - Snell 停止失败" >> "$LOG_FILE"
     fi
 }
 
@@ -123,7 +119,6 @@ install_snell() {
     # 安装必要的软件包
     if ! install_required_packages; then
         echo -e "${RED}安装必要软件包失败，请检查您的网络连接。${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - 安装必要软件包失败" >> "$LOG_FILE"
         exit 1
     fi
 
@@ -131,7 +126,6 @@ install_snell() {
     wget -q "${SNELL_URL}" -O snell-server.zip
     if [ $? -ne 0 ]; then
         echo -e "${RED}下载 Snell 失败。${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - 下载 Snell 失败" >> "$LOG_FILE"
         exit 1
     fi
 
@@ -139,7 +133,6 @@ install_snell() {
     unzip -o -q snell-server.zip -d "${INSTALL_DIR}"
     if [ $? -ne 0 ]; then
         echo -e "${RED}解压缩 Snell 失败。${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - 解压缩 Snell 失败" >> "$LOG_FILE"
         exit 1
     fi
 
@@ -196,7 +189,6 @@ EOF
     systemctl daemon-reload
     if [ $? -ne 0 ]; then
         echo -e "${RED}重载 Systemd 配置失败。${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - 重载 Systemd 配置失败" >> "$LOG_FILE"
         exit 1
     fi
 
@@ -204,7 +196,6 @@ EOF
     systemctl enable snell
     if [ $? -ne 0 ]; then
         echo -e "${RED}开机自启动 Snell 失败。${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - 开机自启动 Snell 失败" >> "$LOG_FILE"
         exit 1
     fi
 
@@ -212,7 +203,6 @@ EOF
     systemctl start snell
     if [ $? -ne 0 ]; then
         echo -e "${RED}启动 Snell 服务失败。${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - 启动 Snell 服务失败" >> "$LOG_FILE"
         exit 1
     fi
 
@@ -246,7 +236,6 @@ update_snell() {
     systemctl stop snell
     if [ $? -ne 0 ]; then
         echo -e "${RED}停止 Snell 失败。${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - 停止 Snell 失败" >> "$LOG_FILE"
         exit 1
     fi
 
@@ -256,7 +245,6 @@ update_snell() {
     # 安装必要的软件包
     if ! install_required_packages; then
         echo -e "${RED}安装必要软件包失败，请检查您的网络连接。${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - 安装必要软件包失败" >> "$LOG_FILE"
         exit 1
     fi
 
@@ -264,14 +252,12 @@ update_snell() {
     wget -q "${SNELL_URL}" -O snell-server.zip
     if [ $? -ne 0 ]; then
         echo -e "${RED}下载 Snell 失败。${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - 下载 Snell 失败" >> "$LOG_FILE"
         exit 1
     fi
 
     unzip -o -q snell-server.zip -d "${INSTALL_DIR}"
     if [ $? -ne 0 ]; then
         echo -e "${RED}解压缩 Snell 失败。${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - 解压缩 Snell 失败" >> "$LOG_FILE"
         exit 1
     fi
 
@@ -281,7 +267,6 @@ update_snell() {
     systemctl restart snell
     if [ $? -ne 0 ]; then
         echo -e "${RED}重启 Snell 失败。${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - 重启 Snell 失败" >> "$LOG_FILE"
         exit 1
     fi
 
@@ -296,21 +281,18 @@ uninstall_snell() {
     systemctl stop snell
     if [ $? -ne 0 ]; then
         echo -e "${RED}停止 Snell 服务失败。${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - 停止 Snell 服务失败" >> "$LOG_FILE"
         exit 1
     fi
 
     systemctl disable snell
     if [ $? -ne 0 ]; then
         echo -e "${RED}禁用开机自启动失败。${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - 禁用开机自启动失败" >> "$LOG_FILE"
         exit 1
     fi
 
     rm -f /lib/systemd/system/snell.service
     if [ $? -ne 0 ]; then
         echo -e "${RED}删除 Systemd 服务文件失败。${RESET}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - 删除 Systemd 服务文件失败" >> "$LOG_FILE"
         exit 1
     fi
 
@@ -319,7 +301,6 @@ uninstall_snell() {
     rm -rf /etc/snell
 
     echo -e "${GREEN}Snell 卸载成功${RESET}"
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - Snell 卸载成功" >> "$LOG_FILE"
 }
 
 # 显示菜单
@@ -371,7 +352,6 @@ show_menu() {
             break
         else
             echo -e "${RED}无效的选项${RESET}"
-            echo "$(date '+%Y-%m-%d %H:%M:%S') - 用户输入无效选项: $choice" >> "$LOG_FILE"
         fi
     done
     echo ""
@@ -389,8 +369,8 @@ main() {
 
     check_root
 
-    touch "$LOG_FILE"
-    chmod 644 "$LOG_FILE"
+    # touch "$LOG_FILE"
+    # chmod 644 "$LOG_FILE"
 
     while true; do
         show_menu
@@ -403,7 +383,6 @@ main() {
                     uninstall_snell
                 else
                     echo -e "${RED}Snell 尚未安装${RESET}"
-                    echo "$(date '+%Y-%m-%d %H:%M:%S') - 尝试卸载但 Snell 尚未安装" >> "$LOG_FILE"
                 fi
                 ;;
             3)
@@ -415,7 +394,6 @@ main() {
                     fi
                 else
                     echo -e "${RED}Snell 尚未安装${RESET}"
-                    echo "$(date '+%Y-%m-%d %H:%M:%S') - 尝试管理服务但 Snell 尚未安装" >> "$LOG_FILE"
                 fi
                 ;;
             4)
@@ -430,12 +408,10 @@ main() {
                 ;;
             0)
                 echo -e "${GREEN}已退出 Snell 管理工具${RESET}"
-                echo "$(date '+%Y-%m-%d %H:%M:%S') - 用户退出管理工具" >> "$LOG_FILE"
                 exit 0
                 ;;
             *)
                 echo -e "${RED}无效的选项${RESET}"
-                echo "$(date '+%Y-%m-%d %H:%M:%S') - 用户输入无效选项: $choice" >> "$LOG_FILE"
                 ;;
         esac
         read -p "按 enter 键继续..."
