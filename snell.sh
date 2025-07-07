@@ -18,7 +18,7 @@ CONF_FILE="${CONF_DIR}/snell-server.conf"
 SYSTEMD_SERVICE_FILE="/lib/systemd/system/snell.service"
 
 # 版本和架构配置
-VERSION="v5.0.0b2"
+VERSION="v5.0.0b3"
 ARCH="$(arch)"
 
 # 构造下载链接
