@@ -362,9 +362,9 @@ show_menu() {
     fi
 
     # 美化菜单标题和分隔线
-    echo -e "${CYAN}╔═══════════════════════════════╗${RESET}"
-    echo -e "${CYAN}║        🚀 Snell Proxy          ║${RESET}"
-    echo -e "${CYAN}╚═══════════════════════════════╝${RESET}"
+    echo -e "${CYAN}╔══════════════════════════════╗${RESET}"
+    echo -e "${CYAN}║        🚀 Snell Proxy         ║${RESET}"
+    echo -e "${CYAN}╚══════════════════════════════╝${RESET}"
     echo -e "安装状态: ${installation_status}"
     echo -e "运行状态: ${running_status}"
     echo -e "运行版本: ${version_status}"
@@ -381,7 +381,7 @@ show_menu() {
     echo "4. 更新 Snell 服务"
     echo "5. 查看 Snell 配置"
     echo "0. 退出"
-    echo -e "${CYAN}═════════════════════════════════${RESET}"
+    echo -e "${CYAN}════════════════════════════════${RESET}"
     while true; do
         read -p "请输入选项编号: " choice
         if [[ "$choice" =~ ^[0-9]+$ ]]; then
