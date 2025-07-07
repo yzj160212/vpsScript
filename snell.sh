@@ -9,11 +9,27 @@ PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 RESET='\033[0m'
 
-# 日志文件路径
+# 基础配置
 LOG_FILE="/var/log/snell_manager.log"
-
-# 服务名称
 SERVICE_NAME="snell.service"
+INSTALL_DIR="/usr/local/bin"
+CONF_DIR="/etc/snell"
+CONF_FILE="${CONF_DIR}/snell-server.conf"
+SYSTEMD_SERVICE_FILE="/lib/systemd/system/snell.service"
+
+# 版本和架构配置
+VERSION="v5.0.0b2"
+ARCH="$(arch)"
+
+# 构造下载链接
+if [[ "$ARCH" == "aarch64" ]]; then
+    SNELL_URL="https://dl.nssurge.com/snell/snell-server-${VERSION}-linux-aarch64.zip"
+else
+    SNELL_URL="https://dl.nssurge.com/snell/snell-server-${VERSION}-linux-amd64.zip"
+fi
+
+# 提取版本号（用于展示）
+VERSION_PARSED=$(basename "$SNELL_URL" | sed -nE 's/^snell-server-(v[0-9]+\.[0-9]+\.[a-zA-Z0-9]+)-.*/\1/p')
 
 # 检测系统类型（只支持debian）
 get_system_type() {
@@ -38,7 +54,7 @@ wait_for_package_manager() {
     fi
 }
 
-# 安装必要的软件包（只支持debian）
+# 安装必要的软件包
 install_required_packages() {
     echo -e "${GREEN}安装必要的软件包${RESET}"
     apt update -q
@@ -104,21 +120,6 @@ install_snell() {
         echo -e "${RED}安装必要软件包失败，请检查您的网络连接。${RESET}"
         echo "$(date '+%Y-%m-%d %H:%M:%S') - 安装必要软件包失败" >> "$LOG_FILE"
         exit 1
-    fi
-
-    # 下载 Snell 服务器文件
-    ARCH="$(arch)"
-    VERSION="v5.0.0b2"
-    SNELL_URL=""
-    INSTALL_DIR="/usr/local/bin"
-    SYSTEMD_SERVICE_FILE="/lib/systemd/system/snell.service"
-    CONF_DIR="/etc/snell"
-    CONF_FILE="${CONF_DIR}/snell-server.conf"
-
-    if [[ "${ARCH}" == "aarch64" ]]; then
-        SNELL_URL="https://dl.nssurge.com/snell/snell-server-${VERSION}-linux-aarch64.zip"
-    else
-        SNELL_URL="https://dl.nssurge.com/snell/snell-server-${VERSION}-linux-amd64.zip"
     fi
 
     # 下载 Snell 服务器文件
@@ -229,9 +230,7 @@ EOF
 
 # 更新 Snell
 update_snell() {
-    INSTALL_DIR="/usr/local/bin"
-    SNELL_BIN="${INSTALL_DIR}/snell-server"
-    if [ ! -f "${SNELL_BIN}" ]; then
+    if [ ! -f "${INSTALL_DIR}/snell-server" ]; then
         echo -e "${YELLOW}Snell 未安装，跳过更新${RESET}"
         return
     fi
@@ -256,17 +255,7 @@ update_snell() {
         exit 1
     fi
 
-    # 下载 Snell 服务器文件
-    ARCH="$(arch)"
-    VERSION="v5.0.0b2"
-    SNELL_URL=""
-
-    if [[ "${ARCH}" == "aarch64" ]]; then
-        SNELL_URL="https://dl.nssurge.com/snell/snell-server-${VERSION}-linux-aarch64.zip"
-    else
-        SNELL_URL="https://dl.nssurge.com/snell/snell-server-${VERSION}-linux-amd64.zip"
-    fi
-
+    # 下载并安装新版本
     wget -q "${SNELL_URL}" -O snell-server.zip
     if [ $? -ne 0 ]; then
         echo -e "${RED}下载 Snell 失败。${RESET}"
@@ -282,8 +271,7 @@ update_snell() {
     fi
 
     rm -f snell-server.zip
-
-    chmod +x "${SNELL_BIN}"
+    chmod +x "${INSTALL_DIR}/snell-server"
 
     systemctl restart snell
     if [ $? -ne 0 ]; then
@@ -322,7 +310,6 @@ uninstall_snell() {
     fi
 
     systemctl daemon-reload
-
     rm -f /usr/local/bin/snell-server
     rm -rf /etc/snell
 
@@ -330,6 +317,7 @@ uninstall_snell() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - Snell 卸载成功" >> "$LOG_FILE"
 }
 
+# 显示菜单
 show_menu() {
     clear
     check_snell_installed
@@ -339,16 +327,7 @@ show_menu() {
 
     if [ $snell_installed -eq 0 ]; then
         installation_status="${GREEN}已安装${RESET}"
-        if version_output=$(/usr/local/bin/snell-server -version 2>&1); then
-            snell_version=$(echo "$version_output" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+[a-zA-Z0-9]*')
-            if [ -n "$snell_version" ]; then
-                version_status="${GREEN}${snell_version}${RESET}"
-            else
-                version_status="${RED}未知版本${RESET}"
-            fi
-        else
-            version_status="${RED}未知版本${RESET}"
-        fi
+        version_status="${GREEN}${VERSION_PARSED}${RESET}"
 
         if [ $snell_running -eq 0 ]; then
             running_status="${GREEN}已启动${RESET}"
@@ -361,7 +340,6 @@ show_menu() {
         version_status="—"
     fi
 
-    # 美化菜单标题和分隔线
     echo -e "${CYAN}╔══════════════════════════════╗${RESET}"
     echo -e "${CYAN}║        🚀 Snell Proxy         ║${RESET}"
     echo -e "${CYAN}╚══════════════════════════════╝${RESET}"
