@@ -325,15 +325,16 @@ show_menu() {
         version_status="${GREEN}${VERSION_PARSED}${RESET}"
         if [ $snell_running -eq 0 ]; then
             running_status="${GREEN}已启动${RESET}"
-            log_info "3. 停止 Snell 服务"
+            option3_text="3. 停止 Snell 服务"
         else
             running_status="${RED}未启动${RESET}"
-            log_info "3. 启动 Snell 服务"
+            option3_text="3. 启动 Snell 服务"
         fi
     else
         installation_status="${RED}未安装${RESET}"
         running_status="${RED}未启动${RESET}"
         version_status="—"
+        option3_text="3. 启动/停止 Snell 服务"
     fi
     echo -e "${CYAN}╔══════════════════════════════╗${RESET}"
     echo -e "${CYAN}║        🚀 Snell Proxy         ║${RESET}"
@@ -344,6 +345,7 @@ show_menu() {
     echo ""
     echo "1. 安装 Snell 服务"
     echo "2. 卸载 Snell 服务"
+    echo "${option3_text}"
     echo "4. 更新 Snell 服务"
     echo "5. 查看 Snell 配置"
     echo "0. 退出"
