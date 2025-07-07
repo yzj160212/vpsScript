@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "https://raw.githubusercontent.com/yzj160212/vpsScript/main/snell.sh",
+      "permanent": true
+    }
+  ]
+}
