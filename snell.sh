@@ -28,7 +28,7 @@ else
     SNELL_URL="https://dl.nssurge.com/snell/snell-server-${VERSION}-linux-amd64.zip"
 fi
 
-# 提取版本号（用于展示）
+# 提取下载压缩文件版本号（用于展示）
 VERSION_PARSED=$(basename "$SNELL_URL" | sed -nE 's/^snell-server-(v[0-9]+\.[0-9]+\.[a-zA-Z0-9]+)-.*/\1/p')
 
 # 检测系统类型（只支持debian）
@@ -57,8 +57,13 @@ wait_for_package_manager() {
 # 安装必要的软件包
 install_required_packages() {
     echo -e "${GREEN}安装必要的软件包${RESET}"
-    apt update -q
-    apt install -y -q wget unzip curl
+    if command -v apt &>/dev/null; then
+        apt update -q
+        apt install -y -q wget unzip curl
+    else
+        apt-get update -q
+        apt-get install -y -q wget unzip curl
+    fi
 }
 
 # 检查是否以 root 权限运行
@@ -377,7 +382,15 @@ trap 'echo -e "${RED}已取消操作${RESET}"; exit' INT
 
 # 主循环
 main() {
+    if [ "$(get_system_type)" != "debian" ]; then
+        echo -e "${RED}本脚本仅支持 Debian 系统${RESET}"
+        exit 1
+    fi
+
     check_root
+
+    touch "$LOG_FILE"
+    chmod 644 "$LOG_FILE"
 
     while true; do
         show_menu
